@@ -5,30 +5,29 @@ Guice extension for Eventuality
 
 Usage
 -----
+```java
+public class MyEventualityUnit extends AbstractEventualityUnit {
+	
+	@Override
+	public void configure() {
+		declare(MyEvent.class);
+		on(MyEvent.class).bind(MyEventListener.class);
+	}
+}
 
-<code>
-	public class MyEventualityUnit extends AbstractEventualityUnit {
+public static void main(String[] args) {
+
+	Injector injector = Guice.createInjector(new EventualityModule() {
 		
 		@Override
-		public void configure() {
-			declare(MyEvent.class);
-			on(MyEvent.class).bind(MyEventListener.class);
+		protected void configureEvents() {
+			install(new MyEventualityUnit());
+			bind(String.class).toInstance("Foo bar!");
 		}
-	}
+	});
 	
-	public static void main(String[] args) {
+	EventDispatcher dispatcher = injector.getInstance(EventDispatcher.class);
 	
-		Injector injector = Guice.createInjector(new EventualityModule() {
-			
-			@Override
-			protected void configureEvents() {
-				install(new MyEventualityUnit());
-				bind(String.class).toInstance("Foo bar!");
-			}
-		});
-		
-		EventDispatcher dispatcher = injector.getInstance(EventDispatcher.class);
-		
-		dispatcher.dispatch(MyEvent.class).onMyEvent();
-	}
-</code>
+	dispatcher.dispatch(MyEvent.class).onMyEvent();
+}
+```
